@@ -1,8 +1,9 @@
 {
   "name": "js-web-crawler",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "Simple JS Web Crawler",
+  "type": "module",
+  "main": "crawler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
