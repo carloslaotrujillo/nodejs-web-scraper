@@ -2,6 +2,7 @@ const { load } = require("cheerio");
 const fs = require("fs/promises");
 const os = require("os");
 
+const DISC_URLS_MAX_SIZE = 150
 const BASE_URL = "https://scrapeme.live/"
 const PAGES_TO_CRAWL = ["https://scrapeme.live/shop"]
 
@@ -41,7 +42,7 @@ async function crawlSite() {
   const discoveredURLs = new Set();
 
   // implement the crawling logic
-  while (pagesToCrawl.length !== 0 && discoveredURLs.size <= 300) {
+  while (pagesToCrawl.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
     const currentPage = pagesToCrawl.pop();
     console.log(`Crawling page: ${currentPage}`);
 
@@ -63,7 +64,7 @@ async function crawlSite() {
   const csvContent = [...discoveredURLs].join(os.EOL);
 
   // export the CSV string to an output file
-  await fs.writeFile("output.csv", csvContent);
+  await fs.writeFile("output/links.csv", csvContent);
 }
 
 crawlSite();
