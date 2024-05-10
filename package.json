@@ -1,16 +1,18 @@
 {
-  "name": "js-web-crawler",
+  "name": "node-web-crawler",
   "version": "0.1.0",
-  "description": "Simple JS Web Crawler",
-  "type": "module",
+  "description": "Simple nodejs web crawler using cheerio",  
   "main": "crawler.js",
   "scripts": {
+    "dev": "nodemon crawler.js",
+    "start": "node crawler.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0-rc.12",
+    "nodemon": "^3.1.0"
   }
 }
