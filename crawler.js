@@ -1,70 +1,84 @@
-const { load } = require("cheerio");
-const fs = require("fs/promises");
 const os = require("os");
+const fs = require("fs/promises");
+const { load } = require("cheerio");
+const fastify = require("fastify")({ logger: true });
 
-const DISC_URLS_MAX_SIZE = 150
-const BASE_URL = "https://scrapeme.live/"
-const PAGES_TO_CRAWL = ["https://scrapeme.live/shop"]
+const DISC_URLS_MAX_SIZE = 100;
 
-// link discovery function
-async function crawlPage(pageURL) {
-  // parse the HTML document returned by the server
-  const response = await fetch(pageURL);
-  const html = await response.text();
-  const $ = load(html);
+async function crawlPage(pageURL, rootUrl) {
+	const response = await fetch(pageURL);
+	const html = await response.text();
+	const $ = load(html);
 
-  // extract all link HTML elements from the page
-  const discoveredHTMLAElements = $("a[href]");
+	const discoveredHTMLAElements = $("a[href]");
 
-  // get the discovered page URLs
-  const discoveredURLs = [];
-  discoveredHTMLAElements.each((_, a) => {
-    discoveredURLs.push($(a).attr("href"));
-  });
+	const discoveredURLs = [];
+	discoveredHTMLAElements.each((_, a) => {
+		discoveredURLs.push($(a).attr("href"));
+	});
 
-  // filter out the undesired URLs
-  const baseURL = BASE_URL;
-  const filteredDiscoveredURLs = discoveredURLs.filter((url) => {
-    return (
-      url.startsWith(baseURL) &&
-      (!url.startsWith(`${baseURL}/wp-admin`) ||
-        url === `${baseURL}/wp-admin/admin-ajax.php`)
-    );
-  });
+	const filteredDiscoveredURLs = discoveredURLs.filter((url) => {
+		return (
+			url.startsWith(rootUrl) &&
+			(!url.startsWith(`${rootUrl}/wp-admin`) || url === `${rootUrl}/wp-admin/admin-ajax.php`)
+		);
+	});
 
-  return filteredDiscoveredURLs;
+	return filteredDiscoveredURLs;
 }
 
-async function crawlSite() {
-  // define the supporting data structures  
-  const pagesToCrawl = PAGES_TO_CRAWL;
-  const pagesCrawled = [];
-  const discoveredURLs = new Set();
+async function crawlSite(pagesToCrawl, baseUrl) {
+	const pagesCrawled = [];
+	const discoveredURLs = new Set();
 
-  // implement the crawling logic
-  while (pagesToCrawl.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
-    const currentPage = pagesToCrawl.pop();
-    console.log(`Crawling page: ${currentPage}`);
+	while (pagesToCrawl.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
+		const currentPage = pagesToCrawl.pop();
+		console.log(`Crawling page: ${currentPage}`);
 
-    const pageDiscoveredURLs = await crawlPage(currentPage);
-    pageDiscoveredURLs.forEach((url) => {
-      discoveredURLs.add(url);
-      if (!pagesCrawled.includes(url) && url !== currentPage) {
-        pagesToCrawl.push(url);
-      }
-    });
-    console.log(`${pageDiscoveredURLs.length} URLs found`);
+		const pageDiscoveredURLs = await crawlPage(currentPage, baseUrl);
+		pageDiscoveredURLs.forEach((url) => {
+			discoveredURLs.add(url);
+			if (!pagesCrawled.includes(url) && url !== currentPage) {
+				pagesToCrawl.push(url);
+			}
+		});
+		console.log(`${pageDiscoveredURLs.length} URLs found`);
 
-    pagesCrawled.push(currentPage);
-    console.log(`${discoveredURLs.size} URLs discovered so far`);
-  }
+		pagesCrawled.push(currentPage);
+		console.log(`${discoveredURLs.size} URLs discovered so far\n`);
+	}
 
-  // convert the set to an array and join its values
-  // to generate CSV content
-  const csvContent = [...discoveredURLs].join(os.EOL);
+	const csvContent = [...discoveredURLs].join(os.EOL);
+	await fs.writeFile("output/links.csv", csvContent);
 
-  // export the CSV string to an output file
-  await fs.writeFile("output/links.csv", csvContent);
+	return discoveredURLs;
 }
 
-crawlSite();
+function getBaseUrl(url) {
+	try {
+		const parsedUrl = new URL(url);
+		return `${parsedUrl.protocol}//${parsedUrl.host}/`;
+	} catch (error) {
+		console.error("Invalid URL:", error);
+		return null;
+	}
+}
+
+fastify.post("/crawl", async function handler(request, reply) {
+	const pagesUrls = request.body.pagesUrls;
+	const baseUrl = getBaseUrl(pagesUrls[0]);
+
+	console.log(pagesUrls, baseUrl);
+
+	const dataCrawled = await crawlSite(pagesUrls, baseUrl);
+	const urlsArray = Array.from(dataCrawled);
+
+	reply.send({ urls: urlsArray });
+});
+
+fastify.listen({ port: 3000 }, (err) => {
+	if (err) {
+		fastify.log.error(err);
+		process.exit(1);
+	}
+});

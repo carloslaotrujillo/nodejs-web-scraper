@@ -3,8 +3,8 @@
 	"description": "Simple nodejs web crawler using cheerio",
 	"version": "0.0.0",
 	"scripts": {
-		"dev": "vite",
-		"server": "nodemon crawler.js",
+		"vite-dev": "vite",
+		"node-dev": "nodemon crawler.js",
 		"crawl": "node crawler.js",
 		"build": "tsc && vite build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"cheerio": "^1.0.0-rc.12",
+		"fastify": "^4.27.0",
 		"nodemon": "^3.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0"

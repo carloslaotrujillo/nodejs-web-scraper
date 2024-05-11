@@ -1,3 +1,2 @@
-[] Add an endpoint to make the crawler dynamic
 [] Add Interface to submit the urls and connect to the node-web-crawler (React, Vue, Angular)
-[] Add options to crawl (ie, links, images, tables etc)
+[] Add options to crawl (ie. links, images, tables etc)
