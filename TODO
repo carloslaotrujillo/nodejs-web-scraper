@@ -1,3 +1,3 @@
 [] Add Interface to submit the urls and connect to the node-web-scraper (React, Vue, Angular)
-[] Add options to crawl (ie. links, images, tables etc)
+[] Add options to scrape (ie. links, images, tables etc)
 [] Make scraper work in parallel on a distributed architecture (Advance)

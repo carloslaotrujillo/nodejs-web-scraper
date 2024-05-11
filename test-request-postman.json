@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "25b2f9d5-f0e6-4bff-9667-b7611463db53",
+		"name": "nodejs-web-scraper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "69972"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/scrape",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \n    \"pagesUrls\": [\"https://www.bbc.com/innovation\", \"https://www.bbc.com/business\", \"https://www.bbc.com/sport\"]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/scrape",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"scrape"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

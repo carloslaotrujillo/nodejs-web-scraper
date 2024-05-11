@@ -5,7 +5,7 @@
 	"scripts": {
 		"vite-dev": "vite",
 		"node-dev": "nodemon scraper.js",
-		"crawl": "node scraper.js",
+		"scrape": "node scraper.js",
 		"build": "tsc && vite build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview"
