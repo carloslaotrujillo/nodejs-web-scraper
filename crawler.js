@@ -5,7 +5,7 @@ const fastify = require("fastify")({ logger: true });
 
 const DISC_URLS_MAX_SIZE = 100;
 
-async function crawlPage(pageURL, rootUrl) {
+async function scrapePage(pageURL, rootUrl) {
 	const response = await fetch(pageURL);
 	const html = await response.text();
 	const $ = load(html);
@@ -27,24 +27,24 @@ async function crawlPage(pageURL, rootUrl) {
 	return filteredDiscoveredURLs;
 }
 
-async function crawlSite(pagesToCrawl, baseUrl) {
-	const pagesCrawled = [];
+async function scrapeSite(pagesToScrape, baseUrl) {
+	const pagesScraped = [];
 	const discoveredURLs = new Set();
 
-	while (pagesToCrawl.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
-		const currentPage = pagesToCrawl.pop();
-		console.log(`Crawling page: ${currentPage}`);
+	while (pagesToScrape.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
+		const currentPage = pagesToScrape.pop();
+		console.log(`Scraping page: ${currentPage}`);
 
-		const pageDiscoveredURLs = await crawlPage(currentPage, baseUrl);
+		const pageDiscoveredURLs = await scrapePage(currentPage, baseUrl);
 		pageDiscoveredURLs.forEach((url) => {
 			discoveredURLs.add(url);
-			if (!pagesCrawled.includes(url) && url !== currentPage) {
-				pagesToCrawl.push(url);
+			if (!pagesScraped.includes(url) && url !== currentPage) {
+				pagesToScrape.push(url);
 			}
 		});
 		console.log(`${pageDiscoveredURLs.length} URLs found`);
 
-		pagesCrawled.push(currentPage);
+		pagesScraped.push(currentPage);
 		console.log(`${discoveredURLs.size} URLs discovered so far\n`);
 	}
 
@@ -64,14 +64,14 @@ function getBaseUrl(url) {
 	}
 }
 
-fastify.post("/crawl", async function handler(request, reply) {
+fastify.post("/scrape", async function handler(request, reply) {
 	const pagesUrls = request.body.pagesUrls;
 	const baseUrl = getBaseUrl(pagesUrls[0]);
 
 	console.log(pagesUrls, baseUrl);
 
-	const dataCrawled = await crawlSite(pagesUrls, baseUrl);
-	const urlsArray = Array.from(dataCrawled);
+	const dataScraped = await scrapeSite(pagesUrls, baseUrl);
+	const urlsArray = Array.from(dataScraped);
 
 	reply.send({ urls: urlsArray });
 });

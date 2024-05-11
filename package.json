@@ -1,11 +1,11 @@
 {
-	"name": "nodejs-web-crawler",
-	"description": "Simple nodejs web crawler using cheerio",
+	"name": "nodejs-web-scraper",
+	"description": "Simple nodejs web scraper using cheerio",
 	"version": "0.0.0",
 	"scripts": {
 		"vite-dev": "vite",
-		"node-dev": "nodemon crawler.js",
-		"crawl": "node crawler.js",
+		"node-dev": "nodemon scraper.js",
+		"crawl": "node scraper.js",
 		"build": "tsc && vite build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview"

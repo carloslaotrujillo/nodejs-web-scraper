@@ -1,3 +1,3 @@
-# nodejs-web-crawler
+# nodejs-web-scraper
 
-#### Simple node.js web crawler using cheerio
+#### Simple node.js web scraper using cheerio
