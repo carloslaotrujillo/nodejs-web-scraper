@@ -68,8 +68,6 @@ fastify.post("/scrape", async function handler(request, reply) {
 	const pagesUrls = request.body.pagesUrls;
 	const baseUrl = getBaseUrl(pagesUrls[0]);
 
-	console.log(pagesUrls, baseUrl);
-
 	const dataScraped = await scrapeSite(pagesUrls, baseUrl);
 	const urlsArray = Array.from(dataScraped);
 
