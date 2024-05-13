@@ -1,9 +1,65 @@
 const os = require("os");
 const fs = require("fs/promises");
 const { load } = require("cheerio");
+const cors = require("@fastify/cors");
 const fastify = require("fastify")({ logger: true });
 
-const DISC_URLS_MAX_SIZE = 100;
+// Constants
+const MAX_RESULTS = 50;
+
+// CORS configuration
+fastify.register(cors, {
+	origin: ["http://localhost", "http://localhost:5173", "http://localhost:4173"],
+	methods: ["POST"],
+	allowedHeaders: ["Content-Type"],
+});
+
+// Start the server
+fastify.listen({ port: 3000 }, (err) => {
+	if (err) {
+		fastify.log.error(err);
+		process.exit(1);
+	}
+});
+
+// POST /scrape
+fastify.post("/scrape", async function handler(request, reply) {
+	const pagesUrls = request.body.pagesUrls;
+	const baseUrl = getBaseUrl(pagesUrls[0]);
+
+	const dataScraped = await scrapeSite(pagesUrls, baseUrl);
+	const urlsArray = Array.from(dataScraped);
+
+	reply.send({ urls: urlsArray });
+});
+
+// Scraper functions
+async function scrapeSite(pagesToScrape, baseUrl) {
+	const pagesScraped = [];
+	const discoveredURLs = new Set();
+
+	while (pagesToScrape.length !== 0 && discoveredURLs.size <= MAX_RESULTS) {
+		const currentPage = pagesToScrape.pop();
+		console.log(`Scraping page: ${currentPage}`);
+
+		const pageDiscoveredURLs = await scrapePage(currentPage, baseUrl);
+		pageDiscoveredURLs.forEach((url) => {
+			discoveredURLs.add(url);
+			if (!pagesScraped.includes(url) && url !== currentPage) {
+				pagesToScrape.push(url);
+			}
+		});
+		console.log(`${pageDiscoveredURLs.length} URLs found`);
+
+		pagesScraped.push(currentPage);
+		console.log(`${discoveredURLs.size} URLs discovered so far\n`);
+	}
+
+	const csvContent = [...discoveredURLs].join(os.EOL);
+	await fs.writeFile("output/links.csv", csvContent);
+
+	return discoveredURLs;
+}
 
 async function scrapePage(pageURL, rootUrl) {
 	const response = await fetch(pageURL);
@@ -27,33 +83,6 @@ async function scrapePage(pageURL, rootUrl) {
 	return filteredDiscoveredURLs;
 }
 
-async function scrapeSite(pagesToScrape, baseUrl) {
-	const pagesScraped = [];
-	const discoveredURLs = new Set();
-
-	while (pagesToScrape.length !== 0 && discoveredURLs.size <= DISC_URLS_MAX_SIZE) {
-		const currentPage = pagesToScrape.pop();
-		console.log(`Scraping page: ${currentPage}`);
-
-		const pageDiscoveredURLs = await scrapePage(currentPage, baseUrl);
-		pageDiscoveredURLs.forEach((url) => {
-			discoveredURLs.add(url);
-			if (!pagesScraped.includes(url) && url !== currentPage) {
-				pagesToScrape.push(url);
-			}
-		});
-		console.log(`${pageDiscoveredURLs.length} URLs found`);
-
-		pagesScraped.push(currentPage);
-		console.log(`${discoveredURLs.size} URLs discovered so far\n`);
-	}
-
-	const csvContent = [...discoveredURLs].join(os.EOL);
-	await fs.writeFile("output/links.csv", csvContent);
-
-	return discoveredURLs;
-}
-
 function getBaseUrl(url) {
 	try {
 		const parsedUrl = new URL(url);
@@ -63,20 +92,3 @@ function getBaseUrl(url) {
 		return null;
 	}
 }
-
-fastify.post("/scrape", async function handler(request, reply) {
-	const pagesUrls = request.body.pagesUrls;
-	const baseUrl = getBaseUrl(pagesUrls[0]);
-
-	const dataScraped = await scrapeSite(pagesUrls, baseUrl);
-	const urlsArray = Array.from(dataScraped);
-
-	reply.send({ urls: urlsArray });
-});
-
-fastify.listen({ port: 3000 }, (err) => {
-	if (err) {
-		fastify.log.error(err);
-		process.exit(1);
-	}
-});

@@ -11,6 +11,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@fastify/cors": "^9.0.1",
 		"cheerio": "^1.0.0-rc.12",
 		"fastify": "^4.27.0",
 		"nodemon": "^3.1.0",
