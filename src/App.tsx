@@ -30,7 +30,7 @@ function App() {
 
 		const url = ensureValidURL(formData.url);
 
-		fetch("http://localhost:3000/scrape", {
+		fetch("https://localhost:3000/scrape", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
