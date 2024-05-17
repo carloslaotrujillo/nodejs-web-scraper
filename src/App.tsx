@@ -30,7 +30,7 @@ function App() {
 
 		const url = ensureValidURL(formData.url);
 
-		fetch("https://node-scraper.charleslaot.com:3000/api/scrape", {
+		fetch("https://node-scraper.charleslaot.com:3000/api/scrape/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
