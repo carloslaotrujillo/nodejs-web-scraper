@@ -92,7 +92,7 @@ function App() {
 
 	return (
 		<>
-			<h1>Node.js URL Scraper with Cheerio</h1>
+			<h1>Node.js URL Scraper</h1>
 			<form id="form" onSubmit={handleSubmit}>
 				<label htmlFor="url">Enter URL: </label>
 				<input type="text" id="url" value={formData.url} onChange={handleChange} required />
