@@ -23,7 +23,7 @@ fastify.listen({ port: 3000 }, (err) => {
 });
 
 // POST /scrape
-fastify.post("/scrape", async function handler(request, reply) {
+fastify.post("/api/scrape", async function handler(request, reply) {
 	const pagesUrls = request.body.pagesUrls;
 	const baseUrl = getBaseUrl(pagesUrls[0]);
 
