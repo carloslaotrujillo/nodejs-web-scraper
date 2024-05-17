@@ -9,7 +9,7 @@ const MAX_RESULTS = 50;
 
 // CORS configuration
 fastify.register(cors, {
-	origin: ["http://localhost", "http://localhost:5173", "http://localhost:4173", "http://localhost:80"],
+	origin: ["http://localhost:5173", "http://localhost:4173", "http://localhost:8000"],
 	methods: ["POST"],
 	allowedHeaders: ["Content-Type"],
 });
